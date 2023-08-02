@@ -12,8 +12,8 @@ class BurpExtender(IBurpExtender, IHttpListener):
         self._output = callbacks.getStdout()
 
         # 정규표현식 패턴 추가
-        self.pattern1 = r'\b\d{2}(0[1-9]|1[0-2])\d{2}(0[1-9]|[12]\d|30|31)[1-4]\d{6}\b'     # 주민등록번호 패턴 1 (13자리)
-        self.pattern2 = r'\b\d{2}(0[1-9]|1[0-2])\d{2}(0[1-9]|[12]\d|30|31)-[1-4]\d{6}\b' # 주민등록번호 패턴 2 (6자리-7자리)
+        self.pattern1 = r'\b\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|30|31)[1-4]\d{6}\b'  # 주민등록번호 패턴 1 (13자리)
+        self.pattern2 = r'\b\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|30|31)-[1-4]\d{6}\b' # 주민등록번호 패턴 2 (6자리-7자리)
         self.pattern3 = r'\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b' # 사설 ip 패턴 3
 
     def processHttpMessage(self, toolFlag, messageIsRequest, messageInfo):

@@ -25,11 +25,11 @@ class BurpExtender(IBurpExtender, IHttpListener):
             matches = re.findall(self.pattern1, request_str) + re.findall(self.pattern2, request_str)
 
             if matches:
-                # Request에 주민등록번호가 있는 경우 하이라이트 설정
-                self.highlight_jumin_request(messageInfo)
+                # Request에 주민등록번호가 있는 경우 빨간색 하이라이트 설정
+                self.highlight(messageInfo, 'red')
 
                 # 사이드 알림창에 메시지 표시
-                self.show_jumin_notification("HTTP Request에 주민등록번호 또는 유사한 형식이 발견되었습니다")
+                self.show_notification("HTTP Request에 주민등록번호 또는 유사한 형식이 발견되었습니다", "주민등록번호 발견")
 
         else:
             response = messageInfo.getResponse()
@@ -42,42 +42,30 @@ class BurpExtender(IBurpExtender, IHttpListener):
             ip_matches = re.findall(self.pattern3, response_str)
 
             if matches:
-                # Response에 주민등록번호가 있는 경우 하이라이트 설정
-                self.highlight_jumin_response(messageInfo)
+                # Response에 주민등록번호가 있는 경우 주황색 하이라이트 설정
+                self.highlight(messageInfo, 'orange')
 
                 # 사이드 알림창에 메시지 표시
-                self.show_jumin_notification("HTTP Response에 주민등록번호 또는 유사한 형식이 발견되었습니다")
+                self.show_notification("HTTP Response에 주민등록번호 또는 유사한 형식이 발견되었습니다", "주민등록번호 발견")
             
             if ip_matches:
                 ip_address = ip_matches[0]
                 is_private = self.is_private_ip(ip_address)
 
                 if is_private:
-                    # Response에 주민등록번호가 있는 경우 하이라이트 설정
-                    self.highlight_ip_response(messageInfo)
+                    # Response에 주민등록번호가 있는 경우 파란색 하이라이트 설정
+                    self.highlight(messageInfo, 'blue')
 
                     # 사이드 알림창에 메시지 표시
-                    self.show_ip_notification("HTTP Response에 사설 ip 형식이 발견되었습니다")
+                    self.show_notification("HTTP Response에 사설 ip 형식이 발견되었습니다", "사설 ip 발견")
 
-    def highlight_jumin_request(self, messageInfo):
-        # 빨간색 하이라이트 설정
-        messageInfo.setHighlight("red")
+    def highlight(self, messageInfo, color):
+        # 하이라이트 설정
+        messageInfo.setHighlight(color)
 
-    def highlight_jumin_response(self, messageInfo):
-        # 주황색 하이라이트 설정
-        messageInfo.setHighlight("orange")
-    
-    def highlight_ip_response(self, messageInfo):
-        # 파란색 하이라이트 설정
-        messageInfo.setHighlight("blue")
-
-    def show_jumin_notification(self, message):
+    def show_notification(self, message, title):
         # macOS의 osascript를 사용하여 사이드 알림창 띄우기
-        subprocess.Popen(['osascript', '-e', 'display notification "{}" with title "주민등록번호 발견"'.format(message)])
-
-    def show_ip_notification(self, message):
-        # macOS의 osascript를 사용하여 사이드 알림창 띄우기
-        subprocess.Popen(['osascript', '-e', 'display notification "{}" with title "사설 ip 발견"'.format(message)])
+        subprocess.Popen(['osascript', '-e', 'display notification "{}" with title "{}"'.format(message, title)])
 
     def is_private_ip(self, ip_address):
         try:
